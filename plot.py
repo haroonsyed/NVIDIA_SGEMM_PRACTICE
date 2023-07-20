@@ -20,17 +20,18 @@ def parse_file(file):
 
 
 def plot(num1, num2, y1, y2, save_dir):
-    x = [(i + 1) * 256 for i in range(len(y1))]
+    x1 = [(i + 1) * 256 for i in range(len(y1))]
+    x2 = [(i + 1) * 256 for i in range(len(y2))]
     fig = plt.figure(figsize=(12, 10))
     if num1 == 0:
         num1 = "culas"
 
-    plt.plot(x, y1, c='k', linewidth=2, label=f"kernel_{num1}")
-    plt.plot(x, y2, c='b', linewidth=2, label=f"kernel_{num2}")
+    plt.plot(x1, y1, c='k', linewidth=2, label=f"kernel_{num1}")
+    plt.plot(x2, y2, c='b', linewidth=2, label=f"kernel_{num2}")
     plt.legend()
 
-    plt.scatter(x, y1, marker="s", s=60, c='', edgecolors='k', linewidth=2)
-    plt.scatter(x, y2, marker="^", s=60, c='', edgecolors='b', linewidth=2)
+    plt.scatter(x1, y1, marker="s", s=60, edgecolors='k', linewidth=2)
+    plt.scatter(x2, y2, marker="^", s=60, edgecolors='b', linewidth=2)
 
     plt.tick_params(labelsize=10)
     plt.xlabel("Matrix size (M=N=K)", fontsize=12, fontweight='bold')
