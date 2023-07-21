@@ -44,7 +44,8 @@ int main(int argc, char **argv) {
     max_size = SIZE[size_len - 1];
     printf("max_size=%d\n", max_size);
 
-    float alpha = 1.0, beta = 0.;  // two arbitary input parameters，C=α*AB+β*C
+    // EQUIVALENT TO MATRIX MULTIPLICATION
+    float alpha = 1.0, beta = 0.0;  // two arbitary input parameters，C=α*AB+β*C
 
     float *A = NULL, *B = NULL, *C = NULL, *C_ref = NULL;      // host matrices
     float *dA = NULL, *dB = NULL, *dC = NULL, *dC_ref = NULL;  // device matrices
