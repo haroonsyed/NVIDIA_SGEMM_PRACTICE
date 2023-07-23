@@ -1,0 +1,5 @@
+Select kernel 10.
+max_size=4096
+m=n=k=256
+error. -22.50,-0.12,0
+Failed to pass the correctness verification against NVIDIA cuBLAS. Exited.

@@ -150,6 +150,12 @@ void test_mysgemm_v3(int M, int N, int K, float alpha, float *A, float *B, float
     mysgemm_v3<64, 64, 8, 8><<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
 }
 
+void test_haroon_mysgemm_v3(int M, int N, int K, float alpha, float *A, float *B, float beta, float *C) {
+    dim3 block_dim(64, 8);
+    dim3 grid_dim((N / block_dim.x) + 1, (M / block_dim.y / block_dim.y) + 1, 1);
+    haroon_mysgemm_v3<64, 64, 8><<<grid_dim, block_dim>>>(M, N, K, A, B, C);
+}
+
 void test_mysgemm_v4(int M, int N, int K, float alpha, float *A, float *B, float beta, float *C) {
     dim3 blockDim(256);
     dim3 gridDim(CEIL_DIV(M, 128), CEIL_DIV(N, 128));
@@ -212,6 +218,9 @@ void test_kernel(int kernel_num, int M, int N, int K, float alpha, float *A, flo
             break;
         case 9:
             test_haroon_mysgemm_v2(M, N, K, alpha, A, B, beta, C);
+            break;
+        case 10:
+            test_haroon_mysgemm_v3(M, N, K, alpha, A, B, beta, C);
             break;
         default:
             break;
