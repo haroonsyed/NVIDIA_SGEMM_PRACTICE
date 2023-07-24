@@ -95,16 +95,30 @@ __global__ void haroon_mysgemm_v3(int M, int N, int K, float *mat1_buffer, float
     int mat2_block_pos = block_col * block_N;
     int out_block_pos = block_row * block_M * N + block_col * block_N;
 
+    // Used to track if out of bounds
+    const int mat1_load_index_row = block_row * block_M + threadIdx.x;
+    int mat1_load_index_col = threadIdx.y;
+
+    int mat2_load_index_row = threadIdx.y;
+    const int mat2_load_index_col = block_col * block_N + threadIdx.x;
+
     // outer loop over block tiles
     for (uint common_block = 0; common_block < K; common_block += block_K) {
-        // Load block data into shared memory
-        s_mat1[threadIdx.x * block_K + threadIdx.y] = mat1_buffer[mat1_block_pos + threadIdx.x * K + threadIdx.y];
-        s_mat2[threadIdx.y * block_N + threadIdx.x] = mat2_buffer[mat2_block_pos + threadIdx.y * N + threadIdx.x];
+        const int mat1_load_index = mat1_block_pos + threadIdx.x * K + threadIdx.y;
+        const int mat2_load_index = mat2_block_pos + threadIdx.y * N + threadIdx.x;
+        const bool exceeded_mat1 = mat1_load_index_row >= M || mat1_load_index_col >= K;
+        const bool exceeded_mat2 = mat2_load_index_row >= K || mat2_load_index_col >= N;
+
+        // Load block data into shared memory. Load 0 is OOB.
+        s_mat1[threadIdx.x * block_K + threadIdx.y] = exceeded_mat1 ? 0.0 : mat1_buffer[mat1_load_index];
+        s_mat2[threadIdx.y * block_N + threadIdx.x] = exceeded_mat2 ? 0.0 : mat2_buffer[mat2_load_index];
         __syncthreads();
 
         // Advance block
         mat1_block_pos += block_K;
         mat2_block_pos += block_K * N;
+        mat1_load_index_col += block_K;
+        mat2_load_index_row += block_K;
 
         // Go through common dimensions of block (across row of mat1 and down col of mat2)
         for (uint common_index = 0; common_index < block_K; ++common_index) {
@@ -120,7 +134,12 @@ __global__ void haroon_mysgemm_v3(int M, int N, int K, float *mat1_buffer, float
     }
 
     // Write results with bounds checking
+    const int out_index_row = block_row * block_M + threadIdx.y * block_K;
+    const int out_index_col = block_col * block_N + threadIdx.x;
+
     for (int i = 0; i < block_K; i++) {
-        out_buffer[out_block_pos + (threadIdx.y * block_K + i) * N + threadIdx.x] = thread_results[i];
+        if (out_index_row + i < M && out_index_col < N) {
+            out_buffer[out_block_pos + (threadIdx.y * block_K + i) * N + threadIdx.x] = thread_results[i];
+        }
     }
 }
