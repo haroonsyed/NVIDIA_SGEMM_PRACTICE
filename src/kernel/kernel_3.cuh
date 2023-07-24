@@ -84,6 +84,7 @@ __global__ void haroon_mysgemm_v3(int M, int N, int K, float *mat1_buffer, float
     // Each one of these threads will handle #block_K output result columns
     __shared__ float s_mat1[block_M * block_K];
     __shared__ float s_mat2[block_K * block_N];
+
     float thread_results[block_K] = {0.0};
 
     const int block_row = blockIdx.y;
@@ -94,29 +95,27 @@ __global__ void haroon_mysgemm_v3(int M, int N, int K, float *mat1_buffer, float
     int mat2_block_pos = block_col * block_N;
     int out_block_pos = block_row * block_M * N + block_col * block_N;
 
-    // TODO: PARTIAL BOUNDS CHECK (try multiply 0 padding?)
-    for (int k = 0; k < K; k += block_K) {
+    // outer loop over block tiles
+    for (uint common_block = 0; common_block < K; common_block += block_K) {
         // Load block data into shared memory
         s_mat1[threadIdx.x * block_K + threadIdx.y] = mat1_buffer[mat1_block_pos + threadIdx.x * K + threadIdx.y];
         s_mat2[threadIdx.y * block_N + threadIdx.x] = mat2_buffer[mat2_block_pos + threadIdx.y * N + threadIdx.x];
         __syncthreads();
 
+        // Advance block
         mat1_block_pos += block_K;
         mat2_block_pos += block_K * N;
 
         // Go through common dimensions of block (across row of mat1 and down col of mat2)
-        for (int common = 0; common < block_K; common++) {
-            // block_k == #outputs in C. So we can cache what mat2 will be
-            const float shared_mat2_val = s_mat2[common * block_N + threadIdx.x];
+        for (uint common_index = 0; common_index < block_K; ++common_index) {
+            const float shared_mat2_val = s_mat2[common_index * block_N + threadIdx.x];
 
             // Now this thread will accumulate the result for each t_row in the t_col of C
-            for (int i = 0; i < block_K; i++) {
-                const int m1_shared_block_row = (threadIdx.y * block_K + i) * block_K;
-                const int m1_shared_block_col = common;
-                thread_results[i] = s_mat1[m1_shared_block_row + m1_shared_block_col] * shared_mat2_val;
+            for (uint result_index = 0; result_index < block_K; ++result_index) {
+                thread_results[result_index] +=
+                    s_mat1[(threadIdx.y * block_K + result_index) * block_K + common_index] * shared_mat2_val;
             }
         }
-
         __syncthreads();
     }
 

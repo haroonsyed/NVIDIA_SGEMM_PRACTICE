@@ -8,13 +8,13 @@
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        printf("Please select a kernel (range 0 - 11, here 0 is for NVIDIA cuBLAS).\n");
+        printf("Please select a kernel (range 0 - n, here 0 is for NVIDIA cuBLAS).\n");
         exit(EXIT_FAILURE);
     }
 
     // cuda kernel num
     int kernel_num = atoi(argv[1]);
-    if (kernel_num < 0 || kernel_num > 11) {
+    if (kernel_num < 0) {
         printf("Please enter a valid kernel number (0-11).\n");
         exit(EXIT_FAILURE);
     } else {

@@ -101,12 +101,19 @@ void print_matrix(const float *A, int M, int N) {
 bool verify_matrix(float *mat1, float *mat2, int N) {
     double diff = 0.0;
     int i;
+
+    int num_wrong = 0;
     for (i = 0; mat1 + i && mat2 + i && i < N; i++) {
         diff = fabs((double)mat1[i] - (double)mat2[i]);
         if (diff > 1e-2) {
-            printf("error. %5.2f,%5.2f,%d\n", mat1[i], mat2[i], i);
-            return false;
+            num_wrong++;
         }
+    }
+
+    if (num_wrong > 0) {
+        float percent_correct = (float)(N - num_wrong) / N;
+        printf("error. Percent Correct: %f\n", percent_correct);
+        return false;
     }
     return true;
 }
@@ -152,7 +159,9 @@ void test_mysgemm_v3(int M, int N, int K, float alpha, float *A, float *B, float
 
 void test_haroon_mysgemm_v3(int M, int N, int K, float alpha, float *A, float *B, float beta, float *C) {
     dim3 block_dim(64, 8);
-    dim3 grid_dim((N / block_dim.x) + 1, (M / block_dim.y / block_dim.y) + 1, 1);
+    // dim3 grid_dim((N / block_dim.x) + 1, (M / block_dim.y / block_dim.y) + 1, 1);
+    // dim3 block_dim(512);
+    dim3 grid_dim(CEIL_DIV(N, 64), CEIL_DIV(M, 64));
     haroon_mysgemm_v3<64, 64, 8><<<grid_dim, block_dim>>>(M, N, K, A, B, C);
 }
 

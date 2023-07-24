@@ -1,3 +1,10 @@
+# Credits
+## Structure of program from https://github.com/wangzyon/NVIDIA_SGEMM_PRACTICE
+
+## Optimization guide from https://siboehm.com/articles/22/CUDA-MMM 
+
+### This has been a great exercise, helped me learn a lot about optimization techniques
+
 ![](images/head.png)
 
 ![](https://img.shields.io/badge/build-passing-brightgreen) ![](https://img.shields.io/badge/ubuntu-18.04-blue) ![](https://img.shields.io/badge/cuda-10.2-blue) ![](https://img.shields.io/badge/nvidia-RTX3090-blue) ![](https://img.shields.io/badge/cmake-3.21-blue)
