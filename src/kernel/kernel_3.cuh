@@ -97,28 +97,31 @@ __global__ void haroon_mysgemm_v3(int M, int N, int K, float *mat1_buffer, float
 
     // Used to track if out of bounds
     const int mat1_load_index_row = block_row * block_M + threadIdx.x;
-    int mat1_load_index_col = threadIdx.y;
-
-    int mat2_load_index_row = threadIdx.y;
     const int mat2_load_index_col = block_col * block_N + threadIdx.x;
+    int common_index = threadIdx.y;
+    const bool exceeded_mat1_row = mat1_load_index_row >= M;
+    const bool exceeded_mat2_col = mat2_load_index_col >= N;
 
     // outer loop over block tiles
     for (uint common_block = 0; common_block < K; common_block += block_K) {
-        const int mat1_load_index = mat1_block_pos + threadIdx.x * K + threadIdx.y;
-        const int mat2_load_index = mat2_block_pos + threadIdx.y * N + threadIdx.x;
-        const bool exceeded_mat1 = mat1_load_index_row >= M || mat1_load_index_col >= K;
-        const bool exceeded_mat2 = mat2_load_index_row >= K || mat2_load_index_col >= N;
+        const int within_mat1 = (int)!(exceeded_mat1_row || common_index >= K);
+        const int within_mat2 = (int)!(common_index >= K || exceeded_mat2_col);
+        int mat1_load_index = mat1_block_pos + threadIdx.x * K + threadIdx.y;
+        int mat2_load_index = mat2_block_pos + threadIdx.y * N + threadIdx.x;
+
+        // Prevent loading OOB
+        mat1_load_index *= within_mat1;
+        mat2_load_index *= within_mat2;
 
         // Load block data into shared memory. Load 0 is OOB.
-        s_mat1[threadIdx.x * block_K + threadIdx.y] = exceeded_mat1 ? 0.0 : mat1_buffer[mat1_load_index];
-        s_mat2[threadIdx.y * block_N + threadIdx.x] = exceeded_mat2 ? 0.0 : mat2_buffer[mat2_load_index];
+        s_mat1[threadIdx.x * block_K + threadIdx.y] = mat1_buffer[mat1_load_index] * within_mat1;
+        s_mat2[threadIdx.y * block_N + threadIdx.x] = mat2_buffer[mat2_load_index] * within_mat2;
         __syncthreads();
 
         // Advance block
         mat1_block_pos += block_K;
         mat2_block_pos += block_K * N;
-        mat1_load_index_col += block_K;
-        mat2_load_index_row += block_K;
+        common_index += block_K;
 
         // Go through common dimensions of block (across row of mat1 and down col of mat2)
         for (uint common_index = 0; common_index < block_K; ++common_index) {
