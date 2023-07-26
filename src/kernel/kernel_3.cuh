@@ -98,14 +98,14 @@ __global__ void haroon_mysgemm_v3(int M, int N, int K, float *mat1_buffer, float
     // Used to track if out of bounds
     const int mat1_load_index_row = block_row * block_M + threadIdx.x;
     const int mat2_load_index_col = block_col * block_N + threadIdx.x;
-    int common_index = threadIdx.y;
+    int mat_common_index = threadIdx.y;
     const bool exceeded_mat1_row = mat1_load_index_row >= M;
     const bool exceeded_mat2_col = mat2_load_index_col >= N;
 
     // outer loop over block tiles
     for (uint common_block = 0; common_block < K; common_block += block_K) {
-        const int within_mat1 = (int)!(exceeded_mat1_row || common_index >= K);
-        const int within_mat2 = (int)!(common_index >= K || exceeded_mat2_col);
+        const int within_mat1 = (int)!(exceeded_mat1_row || mat_common_index >= K);
+        const int within_mat2 = (int)!(mat_common_index >= K || exceeded_mat2_col);
         int mat1_load_index = mat1_block_pos + threadIdx.x * K + threadIdx.y;
         int mat2_load_index = mat2_block_pos + threadIdx.y * N + threadIdx.x;
 
@@ -121,16 +121,16 @@ __global__ void haroon_mysgemm_v3(int M, int N, int K, float *mat1_buffer, float
         // Advance block
         mat1_block_pos += block_K;
         mat2_block_pos += block_K * N;
-        common_index += block_K;
+        mat_common_index += block_K;
 
         // Go through common dimensions of block (across row of mat1 and down col of mat2)
-        for (uint common_index = 0; common_index < block_K; ++common_index) {
-            const float shared_mat2_val = s_mat2[common_index * block_N + threadIdx.x];
+        for (uint block_common_index = 0; block_common_index < block_K; ++block_common_index) {
+            const float shared_mat2_val = s_mat2[block_common_index * block_N + threadIdx.x];
 
             // Now this thread will accumulate the result for each t_row in the t_col of C
             for (uint result_index = 0; result_index < block_K; ++result_index) {
                 thread_results[result_index] +=
-                    s_mat1[(threadIdx.y * block_K + result_index) * block_K + common_index] * shared_mat2_val;
+                    s_mat1[(threadIdx.y * block_K + result_index) * block_K + block_common_index] * shared_mat2_val;
             }
         }
         __syncthreads();

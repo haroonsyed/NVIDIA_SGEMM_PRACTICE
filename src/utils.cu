@@ -159,9 +159,7 @@ void test_mysgemm_v3(int M, int N, int K, float alpha, float *A, float *B, float
 
 void test_haroon_mysgemm_v3(int M, int N, int K, float alpha, float *A, float *B, float beta, float *C) {
     dim3 block_dim(64, 8);
-    // dim3 grid_dim((N / block_dim.x) + 1, (M / block_dim.y / block_dim.y) + 1, 1);
-    // dim3 block_dim(512);
-    dim3 grid_dim(CEIL_DIV(N, 64), CEIL_DIV(M, 64));
+    dim3 grid_dim((N / block_dim.x) + 1, (M / block_dim.y / block_dim.y) + 1, 1);
     haroon_mysgemm_v3<64, 64, 8><<<grid_dim, block_dim>>>(M, N, K, A, B, C);
 }
 
@@ -169,6 +167,14 @@ void test_mysgemm_v4(int M, int N, int K, float alpha, float *A, float *B, float
     dim3 blockDim(256);
     dim3 gridDim(CEIL_DIV(M, 128), CEIL_DIV(N, 128));
     mysgemm_v4<128, 128, 8, 8, 8><<<gridDim, blockDim>>>(M, N, K, alpha, A, B, beta, C);
+}
+
+void test_haroon_mysgemm_v4(int M, int N, int K, float alpha, float *A, float *B, float beta, float *C) {
+    dim3 block_dim(32, 8);
+    // dim3 block_dim(256);
+    // dim3 grid_dim((N / 128)+ 1, (M / 128) + 1, 1);
+    dim3 grid_dim(CEIL_DIV(M, 128), CEIL_DIV(N, 128));
+    haroon_mysgemm_v4<128, 128, 8><<<grid_dim, block_dim>>>(M, N, K, A, B, C);
 }
 
 void test_mysgemm_v5(int M, int N, int K, float alpha, float *A, float *B, float beta, float *C) {
@@ -230,6 +236,9 @@ void test_kernel(int kernel_num, int M, int N, int K, float alpha, float *A, flo
             break;
         case 10:
             test_haroon_mysgemm_v3(M, N, K, alpha, A, B, beta, C);
+            break;
+        case 11:
+            test_haroon_mysgemm_v4(M, N, K, alpha, A, B, beta, C);
             break;
         default:
             break;

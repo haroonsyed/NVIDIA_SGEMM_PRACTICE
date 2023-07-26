@@ -73,6 +73,7 @@ int main(int argc, char **argv) {
     int repeat_times = 10;
     for (int i = 0; i < size_len; i++) {
         m = n = k = SIZE[i];
+        // m = n = k = 4096;
 
         printf("m=n=k=%d\n", m);
         // 验证计算正确性，同时在核函数计时前预先执行一次，避免冷启动误差

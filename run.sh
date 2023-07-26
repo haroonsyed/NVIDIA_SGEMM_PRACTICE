@@ -3,7 +3,7 @@
 # 全部kernel运行
 rm ./test/test_kernel*
 echo -n "test_kernel:"
-for((i=0;i<=10;i++))
+for((i=0;i<=11;i++))
 do
     echo -n "${i}..."
     file_name="./test/test_kernel_${i}.txt"
