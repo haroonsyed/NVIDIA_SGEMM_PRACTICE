@@ -172,8 +172,8 @@ void test_mysgemm_v4(int M, int N, int K, float alpha, float *A, float *B, float
 void test_haroon_mysgemm_v4(int M, int N, int K, float alpha, float *A, float *B, float beta, float *C) {
     dim3 block_dim(32, 8);
     // dim3 block_dim(256);
-    // dim3 grid_dim((N / 128)+ 1, (M / 128) + 1, 1);
-    dim3 grid_dim(CEIL_DIV(M, 128), CEIL_DIV(N, 128));
+    dim3 grid_dim((N / 128) + 1, (M / 128) + 1, 1);
+    // dim3 grid_dim(CEIL_DIV(M, 128), CEIL_DIV(N, 128));
     haroon_mysgemm_v4<128, 128, 8><<<grid_dim, block_dim>>>(M, N, K, A, B, C);
 }
 

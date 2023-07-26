@@ -94,9 +94,6 @@ __global__ void haroon_mysgemm_v4(int M, int N, int K, float *__restrict__ mat1_
 
     float thread_results[block_K * block_K] = {0.0};
 
-    // float cache_mat1[block_K] = {0.0};
-    // float cache_mat2[block_K] = {0.0};
-
     const int block_row = blockIdx.y;
     const int block_col = blockIdx.x;
 
@@ -137,7 +134,7 @@ __global__ void haroon_mysgemm_v4(int M, int N, int K, float *__restrict__ mat1_
             const int within_mat1 = (int)!(exceeded_mat1_row || exceeded_mat1_col);
             const int within_mat2 = (int)!(exceeded_mat2_row || exceeded_mat2_col);
             int mat1_load_index = mat1_pos + mat1_row_within_block * K + mat1_col_within_block;
-            int mat2_load_index = mat2_pos + mat2_row_within_block * K + mat2_col_within_block;
+            int mat2_load_index = mat2_pos + mat2_row_within_block * N + mat2_col_within_block;
 
             mat1_load_index *= within_mat1;
             mat2_load_index *= within_mat2;
@@ -156,16 +153,6 @@ __global__ void haroon_mysgemm_v4(int M, int N, int K, float *__restrict__ mat1_
         // Go through common dimensions of block (across row of mat1 and down col of mat2)
 #pragma unroll 8
         for (int block_common_index = 0; block_common_index < block_K; block_common_index++) {
-            //             // Cache rows and cols  on thread
-            // #pragma unroll 8
-            //             for (int i = 0; i < block_K; i++) {
-            //                 cache_mat1[i] = s_mat1[(out_block_row * block_K + i) * block_K + block_common_index];
-            //             }
-            // #pragma unroll 8
-            //             for (int i = 0; i < block_K; i++) {
-            //                 cache_mat2[i] = s_mat2[(block_common_index * block_N) + (out_block_col * block_K + i)];
-            //             }
-
             // Now this thread will accumulate the block_K x block_K results from shared memory
 #pragma unroll 8
             for (int result_index_row = 0; result_index_row < block_K; result_index_row++) {
@@ -174,8 +161,6 @@ __global__ void haroon_mysgemm_v4(int M, int N, int K, float *__restrict__ mat1_
                     thread_results[result_index_row * block_K + result_index_col] +=
                         s_mat1[(out_block_row * block_K + result_index_row) * block_K + block_common_index] *
                         s_mat2[(block_common_index * block_N) + (out_block_col * block_K + result_index_col)];
-                    // cache_mat1[result_index_row] *
-                    // cache_mat2[result_index_col];
                 }
             }
         }
@@ -186,9 +171,9 @@ __global__ void haroon_mysgemm_v4(int M, int N, int K, float *__restrict__ mat1_
     const int out_index_row = block_row * block_M + out_block_row * block_K;
     const int out_index_col = block_col * block_N + out_block_col * block_K;
 
-#pragma unroll
+#pragma unroll 8
     for (int i = 0; i < block_K; i++) {
-#pragma unroll
+#pragma unroll 8
         for (int j = 0; j < block_K; j++) {
             if (out_index_row + i < M && out_index_col + j < N) {
                 out_buffer[(out_index_row + i) * N + out_index_col + j] = thread_results[i * block_K + j];
