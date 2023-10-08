@@ -1,34 +1,34 @@
 Select kernel 9.
 max_size=4096
 m=n=k=256
-Average elasped time: (0.000063) second, performance: (536.191435) GFLOPS. size: (256).
+Average elasped time: (0.000058) second, performance: (580.671141) GFLOPS. size: (256).
 m=n=k=512
-Average elasped time: (0.000339) second, performance: (792.477144) GFLOPS. size: (512).
+Average elasped time: (0.000333) second, performance: (804.909700) GFLOPS. size: (512).
 m=n=k=768
-Average elasped time: (0.001082) second, performance: (837.595041) GFLOPS. size: (768).
+Average elasped time: (0.001077) second, performance: (841.148685) GFLOPS. size: (768).
 m=n=k=1024
-Average elasped time: (0.002670) second, performance: (804.311616) GFLOPS. size: (1024).
+Average elasped time: (0.002670) second, performance: (804.170858) GFLOPS. size: (1024).
 m=n=k=1280
-Average elasped time: (0.005138) second, performance: (816.373816) GFLOPS. size: (1280).
+Average elasped time: (0.005147) second, performance: (814.895815) GFLOPS. size: (1280).
 m=n=k=1536
-Average elasped time: (0.007731) second, performance: (937.503934) GFLOPS. size: (1536).
+Average elasped time: (0.008768) second, performance: (826.569732) GFLOPS. size: (1536).
 m=n=k=1792
-Average elasped time: (0.011416) second, performance: (1008.147276) GFLOPS. size: (1792).
+Average elasped time: (0.011569) second, performance: (994.804088) GFLOPS. size: (1792).
 m=n=k=2048
-Average elasped time: (0.017030) second, performance: (1008.822067) GFLOPS. size: (2048).
+Average elasped time: (0.016959) second, performance: (1013.047859) GFLOPS. size: (2048).
 m=n=k=2304
-Average elasped time: (0.024284) second, performance: (1007.275527) GFLOPS. size: (2304).
+Average elasped time: (0.024187) second, performance: (1011.331951) GFLOPS. size: (2304).
 m=n=k=2560
-Average elasped time: (0.033923) second, performance: (989.146540) GFLOPS. size: (2560).
+Average elasped time: (0.033423) second, performance: (1003.943375) GFLOPS. size: (2560).
 m=n=k=2816
-Average elasped time: (0.044573) second, performance: (1001.966712) GFLOPS. size: (2816).
+Average elasped time: (0.044178) second, performance: (1010.923362) GFLOPS. size: (2816).
 m=n=k=3072
-Average elasped time: (0.058175) second, performance: (996.689190) GFLOPS. size: (3072).
+Average elasped time: (0.057502) second, performance: (1008.342360) GFLOPS. size: (3072).
 m=n=k=3328
-Average elasped time: (0.073936) second, performance: (997.060856) GFLOPS. size: (3328).
+Average elasped time: (0.072823) second, performance: (1012.311050) GFLOPS. size: (3328).
 m=n=k=3584
-Average elasped time: (0.092247) second, performance: (998.112482) GFLOPS. size: (3584).
+Average elasped time: (0.089870) second, performance: (1024.511569) GFLOPS. size: (3584).
 m=n=k=3840
-Average elasped time: (0.112808) second, performance: (1003.881037) GFLOPS. size: (3840).
+Average elasped time: (0.110214) second, performance: (1027.515607) GFLOPS. size: (3840).
 m=n=k=4096
-Average elasped time: (0.134565) second, performance: (1021.358661) GFLOPS. size: (4096).
+Average elasped time: (0.132622) second, performance: (1036.318939) GFLOPS. size: (4096).
